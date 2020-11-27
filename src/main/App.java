@@ -2,7 +2,9 @@ package main;
 
 import java.io.*;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class App {
 
@@ -44,6 +46,23 @@ public class App {
             System.out.println("You successfully connected to database now");
         } else {
             System.out.println("Failed to make connection to database");
+        }
+
+        try {
+            String lettersQuery = "DROP TABLE IF EXISTS public.letters; CREATE TABLE public.letters (id numeric NOT NULL, value character varying COLLATE pg_catalog.default NOT NULL);";
+            String bigramsQuery = "DROP TABLE IF EXISTS public.bigrams; CREATE TABLE public.bigrams (id numeric NOT NULL, value character varying COLLATE pg_catalog.default NOT NULL);";
+            String trigramsQuery = "DROP TABLE IF EXISTS public.trigrams; CREATE TABLE public.trigrams (id numeric NOT NULL, value character varying COLLATE pg_catalog.default NOT NULL);";
+            String quatrogramsQuery = "DROP TABLE IF EXISTS public.quatrograms; CREATE TABLE public.quatrograms (id numeric NOT NULL, value character varying COLLATE pg_catalog.default NOT NULL);";
+            Statement statement = connection.createStatement();
+            statement.execute(lettersQuery);
+            statement = connection.createStatement();
+            statement.execute(bigramsQuery);
+            statement = connection.createStatement();
+            statement.execute(trigramsQuery);
+            statement = connection.createStatement();
+            statement.execute(quatrogramsQuery);
+        } catch (SQLException e){
+            e.printStackTrace();
         }
 
         // init text
@@ -181,11 +200,11 @@ public class App {
                     id2 = 0;
                     while ((symbol2 = in2.read(charsQuatrogram, 0, 4)) != -1) {
                         if (
-                                (       charsQuatrogram[0] == trigramCharArray[0] &&
+                                (charsQuatrogram[0] == trigramCharArray[0] &&
                                         charsQuatrogram[1] == trigramCharArray[1] &&
                                         charsQuatrogram[2] == trigramCharArray[2])
                                         ||
-                                        (       charsQuatrogram[1] == trigramCharArray[0] &&
+                                        (charsQuatrogram[1] == trigramCharArray[0] &&
                                                 charsQuatrogram[2] == trigramCharArray[1] &&
                                                 charsQuatrogram[3] == trigramCharArray[2])
                         ) {
@@ -209,11 +228,11 @@ public class App {
                     id2 = 0;
                     while ((symbol2 = in2.read(charsQuatrogram, 0, 4)) != -1) {
                         if (
-                                (       charsQuatrogram[0] == trigramCharArray[0] &&
+                                (charsQuatrogram[0] == trigramCharArray[0] &&
                                         charsQuatrogram[1] == trigramCharArray[1] &&
                                         charsQuatrogram[2] == trigramCharArray[2])
-                                ||
-                                        (       charsQuatrogram[1] == trigramCharArray[0] &&
+                                        ||
+                                        (charsQuatrogram[1] == trigramCharArray[0] &&
                                                 charsQuatrogram[2] == trigramCharArray[1] &&
                                                 charsQuatrogram[3] == trigramCharArray[2])
                         ) {
@@ -238,11 +257,11 @@ public class App {
                     id2 = 0;
                     while ((symbol2 = in2.read(charsQuatrogram, 0, 4)) != -1) {
                         if (
-                                (       charsQuatrogram[0] == trigramCharArray[0] &&
+                                (charsQuatrogram[0] == trigramCharArray[0] &&
                                         charsQuatrogram[1] == trigramCharArray[1] &&
                                         charsQuatrogram[2] == trigramCharArray[2])
                                         ||
-                                        (       charsQuatrogram[1] == trigramCharArray[0] &&
+                                        (charsQuatrogram[1] == trigramCharArray[0] &&
                                                 charsQuatrogram[2] == trigramCharArray[1] &&
                                                 charsQuatrogram[3] == trigramCharArray[2])
                         ) {
@@ -268,11 +287,11 @@ public class App {
                     id2 = 0;
                     while ((symbol2 = in2.read(charsQuatrogram, 0, 4)) != -1) {
                         if (
-                                (       charsQuatrogram[0] == trigramCharArray[0] &&
+                                (charsQuatrogram[0] == trigramCharArray[0] &&
                                         charsQuatrogram[1] == trigramCharArray[1] &&
                                         charsQuatrogram[2] == trigramCharArray[2])
                                         ||
-                                        (       charsQuatrogram[1] == trigramCharArray[0] &&
+                                        (charsQuatrogram[1] == trigramCharArray[0] &&
                                                 charsQuatrogram[2] == trigramCharArray[1] &&
                                                 charsQuatrogram[3] == trigramCharArray[2])
                         ) {
@@ -328,5 +347,78 @@ public class App {
         } // табличка для хранения информации по файлам (метадата файла) (serial increment) (переносит файлы и сортирует в хранилище)
         // табличка-словарь (айди и значение-буква или биграмма и тп)
         // связная табличка
+    }
+
+    public static void decypherText() {
+        String text = "3РЫЯУЯЕ2Х1ФХ8ЮЯУЯЕ2ЭХ6РЖЕЩЕ0Х2ЮЩЖЕЩЕ0Ь\"2ЫЩЕ3РЫЯЪЕШРЕФХЮ!УЩЕЮХЕЫ40Щ9!ЁЕК43Х6РЗКЕМЕ3ТХ1Ф\"3ЕЭ4ЧЩЫЩЕЭХЧЕ2ЯСЯЪЁЕТЕЩУ1ХЕХХЕЫЯЮЮ,ЪЕЮХЕ2ЬЯТЩ3ЖЕТЕСХФХЕЮХЕ21ЯСХХ3ЕМЕ20Р2Х3ЙЕЫЯЮ\"ЕЮРЕ2ЫРЫ4ЕЯ23РЮЯТЩ3ЖЕТЕУЯ1\" 4:ЕЩШС4ЕТЯЪФХ3З";
+        String letters = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ0123456789.,!?:\"%-+=/";
+
+        StringBuilder str = new StringBuilder();
+        int step = -17;
+        for (int i = 0; i < text.length(); i++) {
+            char currentChar = text.charAt(i);
+            int neededCharIndex;
+            neededCharIndex = letters.indexOf(currentChar);
+//            }
+            neededCharIndex = Math.abs(neededCharIndex + step);
+            char neededChar = letters.charAt(neededCharIndex);
+            str.append(neededChar);
+        }
+        System.out.println(str);
+    }
+
+    public static void selectCountGrams() {
+        try {
+            Connection connection = null;
+            BufferedWriter out = new BufferedWriter(new PrintWriter(new FileOutputStream("src/resources/numbers.txt", false)));
+            String query = "SELECT value AS Value, COUNT (value) AS Count FROM public.letters GROUP BY value ORDER BY Count DESC;";
+            Statement statement = connection.createStatement();
+            try (ResultSet resultSet = statement.executeQuery(query)) {
+                int i = 0;
+                while (resultSet.next()) {
+                    out.write(resultSet.getString(1) + ";" + resultSet.getString(2) + ";" + "102601" + "\n");
+                    out.flush();
+                }
+            }
+
+            query = "SELECT value AS Value, COUNT (value) AS Count FROM public.bigrams GROUP BY value ORDER BY Count DESC;";
+            statement = connection.createStatement();
+            try (ResultSet resultSet = statement.executeQuery(query)) {
+                String[] trigrams = new String[100];
+                int i = 0;
+                while (resultSet.next()) {
+                    out.write(resultSet.getString(1) + ";" + resultSet.getString(2) + ";" + "102601" + "\n");
+                    out.flush();
+                }
+            }
+
+
+            query = "SELECT value AS Value, COUNT (value) AS Count FROM public.trigrams GROUP BY value ORDER BY Count DESC;";
+            statement = connection.createStatement();
+            try (ResultSet resultSet = statement.executeQuery(query)) {
+                int i = 0;
+                while (resultSet.next()) {
+                    out.write(resultSet.getString(1) + ";" + resultSet.getString(2) + ";" + "102601" + "\n");
+                    out.flush();
+                }
+            }
+
+            query = "SELECT value AS Value, COUNT (value) AS Count FROM public.quatrograms GROUP BY value ORDER BY Count DESC;";
+            statement = connection.createStatement();
+            try (ResultSet resultSet = statement.executeQuery(query)) {
+                String[] trigrams = new String[100];
+                int i = 0;
+                while (resultSet.next()) {
+                    out.write(resultSet.getString(1) + ";" + resultSet.getString(2) + ";" + "49040" + "\n");
+                    out.flush();
+                }
+            }
+        } catch (
+                SQLException e) {
+            System.out.println("result meh meh");
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
     }
 }
